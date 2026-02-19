@@ -9,6 +9,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 RUN pip install --no-cache-dir --prefix=/install --ignore-installed fastmcp
 
+# Clone AlphaFold repository (not in git, so clone during build)
+RUN git clone https://github.com/deepmind/alphafold.git /app/repo/alphafold
+
 # Download AlphaFold2 model parameters during build to avoid repeated downloads
 RUN mkdir -p /app/data/params \
     && wget -q https://storage.googleapis.com/alphafold/alphafold_params_2022-12-06.tar \
@@ -23,9 +26,9 @@ RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=builder /install /usr/local
 COPY --from=builder /app/data /app/data
+COPY --from=builder /app/repo /app/repo
 COPY src/ ./src/
 COPY scripts/ ./scripts/
-COPY repo/ ./repo/
 
 RUN mkdir -p tmp/inputs tmp/outputs
 
