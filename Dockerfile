@@ -10,7 +10,12 @@ RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
 RUN pip install --no-cache-dir --prefix=/install --ignore-installed fastmcp
 
 # Clone AlphaFold repository (not in git, so clone during build)
-RUN git clone https://github.com/deepmind/alphafold.git /app/repo/alphafold
+RUN mkdir -p /app/repo && \
+    for attempt in 1 2 3; do \
+      echo "Clone attempt $attempt/3"; \
+      git clone --depth 1 https://github.com/deepmind/alphafold.git /app/repo/alphafold && break; \
+      if [ $attempt -lt 3 ]; then sleep 5; fi; \
+    done
 
 # Download AlphaFold2 model parameters during build to avoid repeated downloads
 RUN mkdir -p /app/data/params \
