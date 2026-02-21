@@ -28,7 +28,9 @@ COPY --from=builder /install /usr/local
 COPY --from=builder /app/data /app/data
 COPY --from=builder /app/repo /app/repo
 COPY src/ ./src/
+RUN chmod -R a+r /app/src/
 COPY scripts/ ./scripts/
+RUN chmod -R a+r /app/scripts/
 
 RUN mkdir -p tmp/inputs tmp/outputs
 
